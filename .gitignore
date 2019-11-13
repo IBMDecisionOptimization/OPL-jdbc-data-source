@@ -1,0 +1,17 @@
+
+# bin dirs
+bin/
+build/
+
+# This is not distributed, but contain libs for local deps management
+external_libs/
+/target/
+
+# I don't want the eclipse file for the root project to be in the repository,
+# but some examples might have eclipse projects in them
+/.classpath
+/.project
+/.settings/
+
+# ignore jars in examples
+examples/**/*.jar

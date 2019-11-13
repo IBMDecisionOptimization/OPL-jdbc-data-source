@@ -1,0 +1,35 @@
+<datasource>
+	<!-- The connection string
+		 The default url connects to mysql on default port, using database
+		'custom_data_source'
+	 -->
+	<url>jdbc:sqlite:memory</url>
+	
+	<!-- Your connection credentials -->
+	<user></user>
+	<password></password>
+	
+	<!-- When name mapping is activated, the mapping from db resultset to tuples is done on the name of the tuple members.
+	With this file, it should fail (no mapping done on the read section)
+	-->
+	<is_mapping_name>true</is_mapping_name>
+	
+	<!-- The read queries
+		 The name attribute is used to populate the corresponding Data Element.
+	-->
+	<read>
+		<query name="Gasolines">SELECT NOM FROM GASDATA</query>
+		<query name="Oils">SELECT NAME FROM OILDATA</query>
+		<query name="GasData">SELECT nom AS NAME, DEMANDE as DEMAND, PRIX as PRICE, OCTANE, LEAD FROM GASDATA</query>
+		<query name="OilData">SELECT * FROM OILDATA</query>
+	</read>
+	
+	<!-- The output table mapping.
+		 This mapping define how output data sets are exported to the database.
+	-->
+	<write>
+		<!-- This maps the output dataset "Result" to the "result" table -->
+		<table name="Result" target="result"/>
+	</write>
+</datasource>
+

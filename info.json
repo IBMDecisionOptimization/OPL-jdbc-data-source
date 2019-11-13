@@ -1,0 +1,8 @@
+{
+	"provider": ["IBM"], 
+	"name":  "OPL JDBC data source" ,
+	"model": [ "OPL-CPLEX" ],
+	"development": [ "Java" ],
+	"category": [ {"APPLICATION":["Desktop Application"]} ],
+	"abstract": "This repository implements a custom data source to import data from a JDBC data source into an OPL model."
+}

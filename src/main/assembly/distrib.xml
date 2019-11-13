@@ -1,0 +1,30 @@
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0" 
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+  <!--  This is the assembly descriptor for the whole docplex project (mp+cp) -->
+  
+  <id>binaries</id>
+  <baseDirectory>/</baseDirectory>
+  <formats>
+    <format>zip</format>
+  </formats>
+  
+  <includeBaseDirectory>false</includeBaseDirectory>component>
+  
+  <fileSets>
+    <fileSet>
+      <directory>${project.basedir}/examples/studio_integration</directory>
+      <outputDirectory>/opl_jdbc</outputDirectory>
+      <includes>
+        <include>jdbc.js</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+  
+  <files>
+	  <file>
+		<source>target/${project.artifactId}-${project.version}.jar</source>
+		<destName>opl_jdbc/${project.artifactId}.jar</destName>
+	  </file>
+  </files>
+ </assembly>

@@ -1,0 +1,22 @@
+<datasource>
+	<!-- The connection string
+		 The default url connects to mysql on default port, using database
+		'custom_data_source'
+	 -->
+	<url>jdbc:sqlite:memory</url>
+	
+	<!-- Your connection credentials -->
+	<user></user>
+	<password></password>
+
+	
+	<!-- The output table mapping.
+		 This mapping define how output data sets are exported to the database.
+	-->
+	<write>
+		<!-- This maps the output dataset "Result" to the "result" table -->
+		<table name="GasData" target="GASDATA"/>
+		<table name="OilData" target="OILDATA"/>
+	</write>
+</datasource>
+
