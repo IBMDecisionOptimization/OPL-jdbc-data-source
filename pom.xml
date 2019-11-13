@@ -6,7 +6,7 @@
 	<name>OPL jdbc database access</name>
 
 	<groupId>com.ibm.optim.opl</groupId>
-	<artifactId>jdbc-data-source</artifactId>
+	<artifactId>jdbc-custom-data-source</artifactId>
 	<version>1.2</version>
 	<packaging>jar</packaging>
 

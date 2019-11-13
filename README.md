@@ -12,7 +12,7 @@ This example will work with OPL versions greater than 12.6, even if it is config
 
 ## Table of Contents
    - [Prerequisites](#prerequisites)
-   - [Build and run the sample](#build-and-run-the-sample)
+   - [Download and run the sample](#download-and-run-the-sample)
       - [Run the sample from OPL](#run-the-sample-from-opl)
    - [License](#license)   
    
@@ -33,9 +33,18 @@ This example will work with OPL versions greater than 12.6, even if it is config
    MySQL Comunity Server, but is compatible with minimal changes with other JDBC
    compatible databases.
 
-## Build and run the sample
+## Download and run the sample
 
-Before you run, you need to populate the database. See details in subsections:
+You can download the sample by cloning the github repository:
+
+```
+git clone https://github.com/IBMDecisionOptimization/OPL-jdbc-data-source.git
+```
+
+Then you download the latest binaries from https://github.com/IBMDecisionOptimization/OPL-jdbc-data-source/releases 
+The zip file contain an `opl_jdbc` directory containing a `.js` and a `.jar` files. Copy those files next to your OPL project directory, next to your `.dat` and `.mod` files.
+
+Before you run the sample, you need to create and populate an example database. See details in subsections:
 
 - [Run sample with DB2](README.DB2.md)
 - [Run sample with MySQL](README.MySQL.md)
