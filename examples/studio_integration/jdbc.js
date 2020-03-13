@@ -10,7 +10,7 @@
 
 // EDIT: you want to change this for your actual driver.
 // If you have multiple drivers, list them separated by ;
-var jdbc_drivers = "mssql-jdbc-7.4.1.jre8.jar;"
+var jdbc_drivers = "mssql-jdbc-7.4.1.jre8.jar"
 // EDIT: specify where to look for the jdbc driver. Default is in . (besides this .js script) and in ../../external_libs
 var jdbc_driver_path = ".;../../external_libs"
 
@@ -33,9 +33,7 @@ for (var i=0; i < drivers_path.length; i++) {
 	}
 	// load each driver that actually exist on disk
 	for (var j=0; j < drivers.length; j++) {
-		var f = new IloOplFile(drivers_path[i] + "/" + drivers[j]);
-		writeln(drivers_path[i] + "/" + drivers[j]);
-	
+		var f = new IloOplFile(drivers_path[i] + "/" + drivers[j]);	
 		if (f.exists && !f.isDirectory) {
 			IloOplImportJava(drivers_path[i] + "/" + drivers[j])
 		}
