@@ -18,7 +18,9 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Properties;
 
 
@@ -30,19 +32,17 @@ import java.util.Properties;
 public class JdbcCustomDataSource extends IloCustomOplDataSource {
     private JdbcConfiguration _configuration;
     private IloOplModelDefinition _def;
+    private static JdbcCustomDataSourcePublisher _publisher = null;
     
     /**
      * A post process listener to write output
      */
     private static class JdbcCustomDataSourcePublisher extends IloCustomOplPostProcessListener {
-      IloOplModel _model;
-      JdbcConfiguration _config;
+      List<JdbcWriter> _writers = new ArrayList<>();
       
       
-      JdbcCustomDataSourcePublisher(IloOplModel model, JdbcConfiguration config) {
+      JdbcCustomDataSourcePublisher(IloOplModel model) {
         super(IloOplFactory.getOplFactoryFrom(model));
-        _model = model;
-        _config = config;
       }
 
       @Override
@@ -51,7 +51,13 @@ public class JdbcCustomDataSource extends IloCustomOplDataSource {
       
       @Override
       public void customEndPostProcess() {
-        JdbcWriter.writeOutput(_config, _model);
+    	  for (JdbcWriter w: _writers) {
+    		  w.customWrite();
+    	  }
+      }
+      
+      public void addWriter(JdbcWriter w) {
+    	  _writers.add(w);
       }
     }
     
@@ -80,7 +86,13 @@ public class JdbcCustomDataSource extends IloCustomOplDataSource {
         IloOplModelDefinition definition = model.getModelDefinition();
         JdbcCustomDataSource source = new JdbcCustomDataSource(config, factory, definition);
         model.addDataSource(source);
-        model.registerPostProcessListener(new JdbcCustomDataSourcePublisher(model, config));
+        synchronized(JdbcCustomDataSource.class) {
+	        if (JdbcCustomDataSource._publisher == null) {
+	        	JdbcCustomDataSource._publisher = new JdbcCustomDataSourcePublisher(model);
+	        	model.registerPostProcessListener(JdbcCustomDataSource._publisher);
+	        }
+	        JdbcCustomDataSource._publisher.addWriter(new JdbcWriter(config, model));
+        }
         return source;
     }
     

@@ -27,10 +27,19 @@ import com.ibm.opl.customdatasource.sql.NamedParametersPreparedStatement;
  */
 public class JdbcWriter {
     private static long DEFAULT_BATCH_SIZE = 10000;
+    private static long _num = 0;
+    private String _name;
     private JdbcConfiguration _configuration;
     private IloOplModelDefinition _def;
     private IloOplModel _model;
     private long _batch_size;
+    
+    private static String _nextName() {
+    	synchronized (JdbcWriter.class) {
+    		_num ++;
+    		return "writer" + _num;
+    	}
+    }
     
     /**
      * Convenience method to write the output of a model to a database.
@@ -44,13 +53,27 @@ public class JdbcWriter {
       writer.customWrite();
   }
 
-    public JdbcWriter(JdbcConfiguration configuration, IloOplModelDefinition def, IloOplModel model) {
+    public JdbcWriter(String name, JdbcConfiguration configuration, IloOplModelDefinition def, IloOplModel model) {
+    	_name = name;
         _configuration = configuration;
         _def = def;
         _model = model;
         _batch_size = DEFAULT_BATCH_SIZE;
     }
+    
+    public JdbcWriter(JdbcConfiguration configuration, IloOplModelDefinition def, IloOplModel model) {
+        this(JdbcWriter._nextName(), configuration, def, model);
+    }
+    
+    
+    public JdbcWriter(JdbcConfiguration configuration, IloOplModel model) {
+        this(configuration, model.getModelDefinition(), model);
+    }
 
+    public String getName() {
+    	return _name;
+    }
+    
     public void customWrite() {
         long startTime = System.currentTimeMillis();
         System.out.println("Writing elements to database");
