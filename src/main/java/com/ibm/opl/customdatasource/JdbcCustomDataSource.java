@@ -86,11 +86,13 @@ public class JdbcCustomDataSource extends IloCustomOplDataSource {
         IloOplModelDefinition definition = model.getModelDefinition();
         JdbcCustomDataSource source = new JdbcCustomDataSource(config, factory, definition);
         model.addDataSource(source);
-        if (JdbcCustomDataSource._publisher == null) {
-        	JdbcCustomDataSource._publisher = new JdbcCustomDataSourcePublisher(model);
-        	model.registerPostProcessListener(JdbcCustomDataSource._publisher);
+        synchronized(JdbcCustomDataSource.class) {
+	        if (JdbcCustomDataSource._publisher == null) {
+	        	JdbcCustomDataSource._publisher = new JdbcCustomDataSourcePublisher(model);
+	        	model.registerPostProcessListener(JdbcCustomDataSource._publisher);
+	        }
+	        JdbcCustomDataSource._publisher.addWriter(new JdbcWriter(config, model));
         }
-        JdbcCustomDataSource._publisher.addWriter(new JdbcWriter(config, model));
         return source;
     }
     
