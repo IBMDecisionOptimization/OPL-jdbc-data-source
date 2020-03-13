@@ -1,0 +1,31 @@
+// ----------------------------------------------------------------------------
+// Sample material distributed under Apache 2.0 license.
+//
+// Copyright IBM Corporation 2019. All Rights Reserved.
+// ----------------------------------------------------------------------------
+
+prepare {
+	includeScript("jdbc.js");
+
+	// first database 
+	var db1 = JDBCConnector("jdbc:sqlite:{db1_path}");
+	
+	db1.read("table1", "SELECT * from table1");
+	
+	// create result table
+  	db1.execute("CREATE TABLE result1(val INTEGER)");
+  	
+    // write results to database
+  	db1.update("result1", "INSERT INTO result1(val) VALUES (?)");
+  	
+  	// second database 
+	var db2 = JDBCConnector("jdbc:sqlite:{db2_path}");
+	
+	db2.read("table2", "SELECT * from table2");
+	
+	// create result table
+  	db2.execute("CREATE TABLE result2(val INTEGER)");
+  	
+    // write results to database
+  	db2.update("result2", "INSERT INTO result2(val) VALUES (?)");
+}
