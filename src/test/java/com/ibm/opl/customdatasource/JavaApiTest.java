@@ -23,24 +23,6 @@ public class JavaApiTest {
   public static String CREATE_OIL_MOD="models/oil_create_db.mod";
   public static String CREATE_CONFIG_RESOURCE = "models/oil_create_db.xml";
 
-  
-  /**
-   * Runs a model as a .mod file, using a set of .dat files, and a given jdbc configuration.
-   * 
-   * If connectionString is specified, it will be used instead of the url in the jdbc configuration,
-   * allowing for tests with database which url is not static (ex: temporary test databases).
-   * @param modFilename The .mod file
-   * @param datFilenames An array of .dat files
-   * @param jdbcConfigurationFile The jdbc configuration file
-   * @param connectionString An override url
-   * @throws IOException
-   * @throws IloException
-   */
-	public final void runMod(String modFilename, String[] datFilenames, String jdbcConfigurationFile,
-			String connectionString) throws IOException, IloException {
-		ModRunner runner = new ModRunner();
-		runner.run(modFilename, datFilenames, jdbcConfigurationFile, connectionString);
-	}
 
   /**
    * Tests the JdbcCustomReader/Writer by API.
@@ -66,7 +48,7 @@ public class JavaApiTest {
       // (name, demand, price) are replaced by (nom, demande, prix)
       String createModFilename = new File(getClass().getResource(CREATE_OIL_MOD).getFile()).getAbsolutePath();
       String createJdbcConfigurationFile = new File(getClass().getResource(CREATE_CONFIG_RESOURCE).getFile()).getAbsolutePath();
-      runMod(createModFilename, null, createJdbcConfigurationFile, connectionString);
+      TestUtils.runMod(createModFilename, null, createJdbcConfigurationFile, connectionString);
       
       // now solve the oil model => we want an error here
       // in that particular test,that should be a runtime exception
@@ -74,7 +56,7 @@ public class JavaApiTest {
         String modFilename = new File(getClass().getResource(OIL_MOD).getFile()).getAbsolutePath();
         String[] datFilenames = {new File(getClass().getResource(OIL_DAT).getFile()).getAbsolutePath()};
         String jdbcConfigurationFile = new File(getClass().getResource(CONFIG_RESOURCE_NAME_MAPPING_WRONG).getFile()).getAbsolutePath();
-        runMod(modFilename, datFilenames, jdbcConfigurationFile, connectionString);
+        TestUtils.runMod(modFilename, datFilenames, jdbcConfigurationFile, connectionString);
         fail("We should have encountered a SQLException: no such column");
       } catch (RuntimeException re) {
         Throwable cause = re.getCause();
@@ -87,14 +69,14 @@ public class JavaApiTest {
         String modFilename = new File(getClass().getResource(OIL_MOD).getFile()).getAbsolutePath();
         String[] datFilenames = {new File(getClass().getResource(OIL_DAT).getFile()).getAbsolutePath()};
         String jdbcConfigurationFile = new File(getClass().getResource(CONFIG_RESOURCE_NAME_MAPPING_OK).getFile()).getAbsolutePath();
-        runMod(modFilename, datFilenames, jdbcConfigurationFile, connectionString);
+        TestUtils.runMod(modFilename, datFilenames, jdbcConfigurationFile, connectionString);
       }
       // resolve, without name mapping
       {
         String modFilename = new File(getClass().getResource(OIL_MOD).getFile()).getAbsolutePath();
         String[] datFilenames = {new File(getClass().getResource(OIL_DAT).getFile()).getAbsolutePath()};
         String jdbcConfigurationFile = new File(getClass().getResource(CONFIG_RESOURCE_NO_NAME_MAPPING).getFile()).getAbsolutePath();
-        runMod(modFilename, datFilenames, jdbcConfigurationFile, connectionString);
+        TestUtils.runMod(modFilename, datFilenames, jdbcConfigurationFile, connectionString);
       }
     } catch (IloOplException ex) {
       ex.printStackTrace();

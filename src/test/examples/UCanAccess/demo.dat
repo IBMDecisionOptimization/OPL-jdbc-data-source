@@ -1,0 +1,28 @@
+// ----------------------------------------------------------------------------
+// Sample material distributed under Apache 2.0 license.
+//
+// Copyright IBM Corporation 2019. All Rights Reserved.
+// ----------------------------------------------------------------------------
+
+prepare {
+	includeScript("jdbc.js");
+
+  	// Create the jdbc custom data source
+	var db = JDBCConnector("jdbc:ucanaccess://C:/work/OPL-jdbc-data-source/src/test/examples/UCanAccess/oil.accdb;username=Admin");
+	
+	// input data
+  	db.read("Gasolines", "SELECT NAME FROM GasData");
+  	db.read("Oils", "SELECT NAME FROM OILDATA");
+  	db.read("GasData", "SELECT * FROM GASDATA");
+  	db.read("OilData", "SELECT * FROM OILDATA");
+	
+	// create result table
+	db.execute("DROP TABLE result");
+  	db.execute("CREATE TABLE result(oil VARCHAR(30), gas VARCHAR(30), blend FLOAT, a FLOAT)");
+  	
+    // write results to database
+  	db.update("Result", "INSERT INTO result(oil, gas, blend, a) VALUES (?,?,?,?)");
+}
+
+MaxProduction = 14000;
+ProdCost = 4;

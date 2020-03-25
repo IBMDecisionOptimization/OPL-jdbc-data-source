@@ -43,6 +43,12 @@
 		    <version>2.6</version>
 		    <scope>test</scope>
 		</dependency>
+		<dependency>
+		    <groupId>net.sf.ucanaccess</groupId>
+		    <artifactId>ucanaccess</artifactId>
+		    <version>5.0.0</version>
+		    <scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
