@@ -10,9 +10,9 @@
 
 // EDIT: you want to change this for your actual driver.
 // If you have multiple drivers, list them separated by ;
-var jdbc_drivers = "ucanaccess-5.0.0.jar"
+var jdbc_drivers = "ucanaccess-5.0.0.jar;commons-lang3-3.8.1.jar;commons-logging-1.2.jar;hsqldb-2.5.0.jar;jackcess-3.0.1.jar"
 // EDIT: specify where to look for the jdbc driver. Default is in . (besides this .js script) and in ../../external_libs
-var jdbc_driver_path = ".;../../external_libs"
+var jdbc_driver_path = ".;../../../../external_libs"
 
 
 // EDIT: specfify where jdbc-custom-data-source is of the github project.
