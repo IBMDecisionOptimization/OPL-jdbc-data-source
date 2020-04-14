@@ -46,7 +46,7 @@ for (var i=0; i < drivers_path.length; i++) {
 var drivers_path = jdbc_driver_path.split(";");
 for (var i=0; i < drivers_path.length; i++) {
 	var drivers = jdbc_drivers.split(";");
-	for (var j=0; j < drivers.lenth; j++) {
+	for (var j=0; j < drivers.length; j++) {
 		var f = new IloOplFile(drivers_path[i] + "/" + drivers[j]);
 		writeln(f);
 		if (f.exists) {
