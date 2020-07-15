@@ -1,5 +1,6 @@
 package com.ibm.opl.customdatasource;
 
+import ilog.concert.IloException;
 import ilog.concert.IloTuple;
 import ilog.opl.IloOplElement;
 import ilog.opl.IloOplElementDefinition;
@@ -77,12 +78,10 @@ public class JdbcWriter {
     public void customWrite() {
         long startTime = System.currentTimeMillis();
         System.out.println("Writing elements to database");
-        Map<String, JdbcConfiguration.OutputParameters> outputMapping = _configuration.getOutputMapping();
 
-        for (String name : outputMapping.keySet()) {
-          JdbcConfiguration.OutputParameters op = outputMapping.get(name);
-          System.out.println("Writing " + name);
-          customWrite(name, op);
+        for(JdbcConfiguration.OutputParameters op: _configuration.getOutputParameters()) {
+          System.out.println("Writing " + op.name);
+          customWrite(op.name, op);
         }
         long endTime = System.currentTimeMillis();
         System.out.println("Done (" + (endTime - startTime)/1000.0 + " s)");
@@ -147,6 +146,12 @@ public class JdbcWriter {
     void updateValues(IloTuple tuple) throws SQLException;
   }
 
+  public static class NullValuesUpdater implements ValuesUpdater {
+    public void updateValues(IloTuple tuple) throws SQLException {
+	  // do nothing
+    }
+  }
+  
   /**
    * A ValuesUpdater updating values by name.
    *
@@ -187,6 +192,7 @@ public class JdbcWriter {
   public static class IndexedValuesUpdater implements ValuesUpdater{
     Type[] _types = null;
     PreparedStatement _stmt;
+    int _max;
     IndexedValuesUpdater(IloTupleSchema schema, IloOplTupleSchemaDefinition tupleSchemaDef,
         PreparedStatement stmt) {
       _types = new Type[schema.getSize()];
@@ -194,10 +200,15 @@ public class JdbcWriter {
         _types[i] = tupleSchemaDef.getComponent(i).getElementDefinitionType();
       }
       _stmt = stmt;
+      try {
+        _max = stmt.getParameterMetaData().getParameterCount();
+      } catch (SQLException e) {
+    	_max = 9999999;
+      }
     }
     public void updateValues(IloTuple tuple) throws SQLException {
       PreparedStatement stmt = _stmt;
-      for (int i=0; i < _types.length; i++) {
+      for (int i=0; i < _types.length && i < this._max; i++) {
         int columnIndex = i + 1;
         Type columnType = _types[i];
         if (columnType == Type.INTEGER)
@@ -220,10 +231,11 @@ public class JdbcWriter {
      * @param table The database table.
      */
     void customWrite(String name, OutputParameters op) {
-      String table = op.outputTable;
-        IloOplElement elt = _model.getElement(name);
-        ilog.opl_core.cppimpl.IloTupleSet tupleSet = (ilog.opl_core.cppimpl.IloTupleSet) elt.asTupleSet();
-        IloTupleSchema schema = tupleSet.getSchema_cpp();
+        String table = op.outputTable;
+        IloOplElement elt = _model.hasElement(name) ? _model.getElement(name) : null;
+
+        ilog.opl_core.cppimpl.IloTupleSet tupleSet = (elt != null) ? (ilog.opl_core.cppimpl.IloTupleSet) elt.asTupleSet() : null;
+        IloTupleSchema schema = (tupleSet != null) ? tupleSet.getSchema_cpp() : null;
         try (Connection conn = DriverManager.getConnection(_configuration.getUrl(), _configuration.getUser(),
                     _configuration.getPassword())) {
             try (Statement stmt = conn.createStatement()) {
@@ -257,11 +269,15 @@ public class JdbcWriter {
             } 
             NamedParametersPreparedStatement np_stmt = null;
             try {
-              IloOplElementDefinition tupleDef = _def.getElementDefinition(schema.getName());
-              IloOplTupleSchemaDefinition tupleSchemaDef = tupleDef.asTupleSchema();
-              final Type[] columnType = new Type[schema.getSize()];
-              for (int i = 0; i < columnType.length; ++i)
-                  columnType[i] = tupleSchemaDef.getComponent(i).getElementDefinitionType();
+              IloOplTupleSchemaDefinition tupleSchemaDef = null;
+              if (schema != null) {
+            	 IloOplElementDefinition tupleDef = _def.getElementDefinition(schema.getName());
+            	 tupleSchemaDef = tupleDef.asTupleSchema();
+                 final Type[] columnType = new Type[schema.getSize()];
+                 for (int i = 0; i < columnType.length; ++i)
+                    columnType[i] = tupleSchemaDef.getComponent(i).getElementDefinitionType();
+              }
+           
               
               String psql = null;
               if (op.outputTable != null && op.insertStatement == null) {
@@ -274,7 +290,10 @@ public class JdbcWriter {
 
               // The helper to updater a statement given a tuple
               ValuesUpdater updater = null;
-              if (np_stmt.hasNamedParameters()) {
+
+              if (tupleSet == null) {
+                updater = new NullValuesUpdater();
+              } else if (np_stmt.hasNamedParameters()) {
                 updater = new NamedValuesUpdater(schema, tupleSchemaDef, np_stmt);
               } else {
                 // the named parameters prepared statement did not parse any named parameters
@@ -284,7 +303,8 @@ public class JdbcWriter {
               
               // the insert loop
               long icount = 1;
-              for (java.util.Iterator it1 = tupleSet.iterator(); it1.hasNext();) {
+              if (tupleSet != null) {
+                for (java.util.Iterator it1 = tupleSet.iterator(); it1.hasNext();) {
                   IloTuple tuple = (IloTuple) it1.next();
                   updater.updateValues(tuple);
                   if (_batch_size == 0) {
@@ -297,8 +317,11 @@ public class JdbcWriter {
                     }
                   }
                   icount ++;
+                }
+              } else {
+            	  np_stmt.executeUpdate();
               }
-
+              
               // flush batches if any
               if (_batch_size != 0) {
                 np_stmt.executeBatch();

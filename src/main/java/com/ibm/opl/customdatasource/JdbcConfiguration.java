@@ -1,7 +1,9 @@
 package com.ibm.opl.customdatasource;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import org.w3c.dom.*;
@@ -22,8 +24,9 @@ public class JdbcConfiguration {
     Properties _readProperties = new Properties();
     
     public static class OutputParameters {
-      public OutputParameters(boolean autodrop,
+      public OutputParameters(String name, boolean autodrop,
           String createStatement,String insertStatement, String target) {
+        this.name = name;
         this.autodrop = autodrop;
         this.createStatement = createStatement;
         this.insertStatement = insertStatement;
@@ -35,9 +38,11 @@ public class JdbcConfiguration {
       String insertStatement = null;
       // parameters for automatic generation, used in jdbcWriter
       String outputTable = null;
+      // name of the table
+      String name = null;
     }
     
-    Map<String, OutputParameters> _outputMapping = new HashMap<String, OutputParameters>();
+    List<OutputParameters> _outputParameters = new ArrayList<OutputParameters>();
 
     private final static String URL = "url";
     private final static String USER = "user";
@@ -127,9 +132,9 @@ public class JdbcConfiguration {
       _readProperties.setProperty(name, query);
     }
     
-    public Map<String, OutputParameters> getOutputMapping() {
-      return _outputMapping;
-    }
+    public List<OutputParameters> getOutputParameters() {
+        return _outputParameters;
+      }
     
     /**
      * Adds a write mapping to the datasource.
@@ -146,13 +151,14 @@ public class JdbcConfiguration {
       addOutputParameters(name, true, null, null, target);
     }
     
-    public void addOutputParameters(String name, boolean autodrop,
-      String createStatement, String insertStatement, String target) {
-      _outputMapping.put(name, new OutputParameters(autodrop, createStatement, insertStatement, target));
+    public void addOutputParameters(String name, boolean autodrop, 
+                                    String createStatement, String insertStatement, String target) {
+      OutputParameters params = new OutputParameters(name, autodrop, createStatement, insertStatement, target);
+      _outputParameters.add(params);
     }
     
     public void addInsertStatement(String name, String insertStatement) {
-      _outputMapping.put(name, new OutputParameters(false, null, insertStatement, null));
+      this.addOutputParameters(name, false, null, insertStatement, null); 
     }
     
     /**
