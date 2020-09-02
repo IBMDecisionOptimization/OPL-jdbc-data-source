@@ -129,7 +129,7 @@ public class JdbcCustomDataSource extends IloCustomOplDataSource {
         try {
             System.out.println("Reading elements from database");
             Properties prop = _configuration.getReadQueries();
-            Enumeration<?> propertyNames = prop.propertyNames();
+            Enumeration<?> propertyNames = _configuration.getReadQueriesNames(true);
             while (propertyNames.hasMoreElements()) {
                String name = (String) propertyNames.nextElement();
                String query = prop.getProperty(name);
