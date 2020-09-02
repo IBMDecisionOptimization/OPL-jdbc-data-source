@@ -1,6 +1,7 @@
 package com.ibm.opl.customdatasource;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +23,8 @@ import java.sql.Statement;
  */
 public class JdbcConfiguration {
     Properties _readProperties = new Properties();
+    // store read queries by name, in order
+    List<String> _readPropertiesNames = new ArrayList<String>();
     
     public static class OutputParameters {
       public OutputParameters(String name, boolean autodrop,
@@ -121,6 +124,15 @@ public class JdbcConfiguration {
         return _readProperties;
     }
     
+    public Enumeration<?> getReadQueriesNames(boolean inOrder) {
+    	if (inOrder) {
+    		return Collections.enumeration(_readPropertiesNames);
+    	} else {
+    		return getReadQueries().propertyNames();
+    	}
+    }
+
+    
     /**
      * Adds a read query to the datasource.
      * 
@@ -130,6 +142,7 @@ public class JdbcConfiguration {
      */
     public void addReadQuery(String name, String query) {
       _readProperties.setProperty(name, query);
+      _readPropertiesNames.add(name);
     }
     
     public List<OutputParameters> getOutputParameters() {
@@ -236,7 +249,7 @@ public class JdbcConfiguration {
             if (name.startsWith(read)) {
                 int pos = read.length();
                 String element = name.substring(pos);
-                _readProperties.setProperty(element, (String) properties.getProperty(name));
+                this.addReadQuery(element, (String) properties.getProperty(name));
             } else if (name.startsWith(write)) {
                 int pos = write.length();
                 String element = name.substring(pos);
@@ -314,7 +327,7 @@ public class JdbcConfiguration {
                         Element qElement = (Element)qNode;
                         String name = qElement.getAttribute(NAME);
                         String query = qElement.getTextContent();
-                        _readProperties.setProperty(name, query);
+                        this.addReadQuery(name, query);
                     }
                 }
             }
