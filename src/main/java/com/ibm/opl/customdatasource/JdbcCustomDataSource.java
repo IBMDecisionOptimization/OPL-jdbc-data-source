@@ -92,8 +92,7 @@ public class JdbcCustomDataSource extends IloCustomOplDataSource {
         IloOplModelDefinition definition = model.getModelDefinition();
         JdbcCustomDataSource source = new JdbcCustomDataSource(config, factory, definition);
         model.addDataSource(source);
-    	int modelhash = System.identityHashCode(model);
-
+    	int modelhash = factory.hashCode();
         synchronized(JdbcCustomDataSource.class) {
         	// get the publisher for the current `model`
         	JdbcCustomDataSourcePublisher publisher = JdbcCustomDataSource._publishers.get(modelhash);
