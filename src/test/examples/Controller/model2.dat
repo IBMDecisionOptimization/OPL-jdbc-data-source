@@ -1,0 +1,16 @@
+prepare {
+	includeScript("jdbc.js");
+
+  	// Create the jdbc custom data source
+	var db = JDBCConnector("jdbc:sqlite:example.db");
+	
+	// create result table
+	db.execute("DROP TABLE model2_result1");
+  	db.execute("CREATE TABLE model2_result1(z VARCHAR(30), ts FLOAT)");
+  	db.execute("DROP TABLE model2_result2");
+  	db.execute("CREATE TABLE model2_result2(z VARCHAR(30), ts FLOAT)");
+	
+    // write results to database
+  	db.update("Result1", "INSERT INTO model2_result1(z, ts) VALUES (?, ?)");
+	db.update("Result2", "INSERT INTO model2_result2(z, ts) VALUES (?, ?)");
+}

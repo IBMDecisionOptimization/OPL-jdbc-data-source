@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
@@ -32,7 +33,8 @@ import java.util.Properties;
 public class JdbcCustomDataSource extends IloCustomOplDataSource {
     private JdbcConfiguration _configuration;
     private IloOplModelDefinition _def;
-    private static JdbcCustomDataSourcePublisher _publisher = null;
+    // We need to keep a mapping so that we have one publisher per model
+    private static HashMap<Integer, JdbcCustomDataSourcePublisher> _publishers = new HashMap<Integer, JdbcCustomDataSourcePublisher>();
     
     /**
      * A post process listener to write output
@@ -58,6 +60,10 @@ public class JdbcCustomDataSource extends IloCustomOplDataSource {
       
       public void addWriter(JdbcWriter w) {
     	  _writers.add(w);
+      }
+      
+      public int size() {
+    	  return _writers.size();
       }
     }
     
@@ -86,12 +92,18 @@ public class JdbcCustomDataSource extends IloCustomOplDataSource {
         IloOplModelDefinition definition = model.getModelDefinition();
         JdbcCustomDataSource source = new JdbcCustomDataSource(config, factory, definition);
         model.addDataSource(source);
+    	int modelhash = System.identityHashCode(model);
+
         synchronized(JdbcCustomDataSource.class) {
-	        if (JdbcCustomDataSource._publisher == null) {
-	        	JdbcCustomDataSource._publisher = new JdbcCustomDataSourcePublisher(model);
-	        	model.registerPostProcessListener(JdbcCustomDataSource._publisher);
-	        }
-	        JdbcCustomDataSource._publisher.addWriter(new JdbcWriter(config, model));
+        	// get the publisher for the current `model`
+        	JdbcCustomDataSourcePublisher publisher = JdbcCustomDataSource._publishers.get(modelhash);
+        	if (publisher == null) {
+        		// create a publisher for the `model` and add it to the book keeping map
+ 	        	publisher = new JdbcCustomDataSourcePublisher(model);
+ 	        	model.registerPostProcessListener(publisher);
+ 	        	JdbcCustomDataSource._publishers.put(modelhash, publisher);
+ 	        }
+ 	        publisher.addWriter(new JdbcWriter(config, model));
         }
         return source;
     }
