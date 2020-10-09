@@ -8,7 +8,6 @@ prepare {
 	includeScript("jdbc.js");
 
 	// first database 
-	writeln("Connector 1");
 	var db1 = JDBCConnector("jdbc:sqlite:{db1_path}");
 	
 	db1.read("table1", "SELECT * from table1");
@@ -19,9 +18,7 @@ prepare {
     // write results to database
   	db1.update("result1", "INSERT INTO result1(val) VALUES (?)");
   	
-  	// second database 
-  	writeln("Connector 2");
-  	
+  	// second database   	
 	var db2 = JDBCConnector("jdbc:sqlite:{db2_path}");
 	
 	db2.read("table2", "SELECT * from table2");
