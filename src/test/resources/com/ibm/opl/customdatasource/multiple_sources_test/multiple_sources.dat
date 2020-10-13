@@ -18,7 +18,7 @@ prepare {
     // write results to database
   	db1.update("result1", "INSERT INTO result1(val) VALUES (?)");
   	
-  	// second database 
+  	// second database   	
 	var db2 = JDBCConnector("jdbc:sqlite:{db2_path}");
 	
 	db2.read("table2", "SELECT * from table2");

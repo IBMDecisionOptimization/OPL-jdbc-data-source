@@ -10,7 +10,7 @@
 
 // EDIT: you want to change this for your actual driver.
 // If you have multiple drivers, list them separated by ;
-var jdbc_drivers = "mssql-jdbc-7.4.1.jre8.jar"
+var jdbc_drivers = "sqlite-jdbc-3.27.2.jar"
 // EDIT: specify where to look for the jdbc driver. Default is in . (besides this .js script) and in ../../external_libs
 var jdbc_driver_path = ".;../../external_libs"
 

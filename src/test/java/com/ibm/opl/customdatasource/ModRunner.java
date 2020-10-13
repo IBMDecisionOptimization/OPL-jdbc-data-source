@@ -47,6 +47,7 @@ public class ModRunner {
 
 		rc.setErrorHandler(errHandler);
 		IloOplModel opl = rc.getOplModel();
+		System.err.println("IIIII " + IloOplModel.getCPtr(opl));
 
 		IloOplModelDefinition def = opl.getModelDefinition();
 
