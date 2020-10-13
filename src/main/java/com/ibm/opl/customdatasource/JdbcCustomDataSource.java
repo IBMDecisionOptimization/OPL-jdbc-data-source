@@ -34,7 +34,7 @@ public class JdbcCustomDataSource extends IloCustomOplDataSource {
     private JdbcConfiguration _configuration;
     private IloOplModelDefinition _def;
     // We need to keep a mapping so that we have one publisher per model
-    private static HashMap<Integer, JdbcCustomDataSourcePublisher> _publishers = new HashMap<Integer, JdbcCustomDataSourcePublisher>();
+    private static HashMap<String, JdbcCustomDataSourcePublisher> _publishers = new HashMap<String, JdbcCustomDataSourcePublisher>();
     
     /**
      * A post process listener to write output
@@ -92,7 +92,7 @@ public class JdbcCustomDataSource extends IloCustomOplDataSource {
         IloOplModelDefinition definition = model.getModelDefinition();
         JdbcCustomDataSource source = new JdbcCustomDataSource(config, factory, definition);
         model.addDataSource(source);
-    	int modelhash = factory.hashCode();
+    	String modelhash = model.getSourceName();
         synchronized(JdbcCustomDataSource.class) {
         	// get the publisher for the current `model`
         	JdbcCustomDataSourcePublisher publisher = JdbcCustomDataSource._publishers.get(modelhash);
